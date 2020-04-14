@@ -1,0 +1,60 @@
+[OSEv3:children]
+masters
+nodes
+etcd
+glusterfs
+
+[OSEv3:vars]
+################################################################################
+# Set RedHat account credentials
+oreg_auth_user=[rhel-account-user]
+oreg_auth_password=[rhel-account-pass]
+################################################################################
+# Set console hostname
+openshift_console_public_hostname=[master-public-hostname]
+openshift_master_cluster_public_hostname=[master-public-hostname]
+################################################################################
+# Set authentication
+openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider'}]
+openshift_master_htpasswd_users={'ocuser':'$apr1$gi4rtwds$EoQz6fWF7.N7hd6B2wLW11}
+#openshift_master_htpasswd_file=/etc/origin/openshift-passwd
+################################################################################
+ansible_ssh_user=ec2-user
+ansible_become=true
+openshift_deployment_type=openshift-enterprise
+openshift_console_install=true
+openshift_storage_glusterfs_namespace=app-storage
+openshift_storage_glusterfs_storageclass=true
+openshift_storage_glusterfs_storageclass_default=false
+openshift_storage_glusterfs_block_deploy=true
+openshift_storage_glusterfs_block_host_vol_create=true
+openshift_storage_glusterfs_block_host_vol_size=100
+openshift_storage_glusterfs_block_storageclass=true
+openshift_storage_glusterfs_block_storageclass_default=false
+openshift_storage_glusterfs_image=registry.redhat.io/rhgs3/rhgs-server-rhel7:v3.11
+openshift_storage_glusterfs_block_image=registry.redhat.io/rhgs3/rhgs-gluster-block-prov-rhel7:v3.11
+openshift_storage_glusterfs_heketi_image=registry.redhat.io/rhgs3/rhgs-volmanager-rhel7:v3.11
+
+
+[masters]
+ip-10-0-10-11.eu-central-1.compute.internal
+
+[nodes]
+################################################################################
+# masters should be schedulable to run web console pods
+#
+ip-10-0-10-11.eu-central-1.compute.internal         openshift_schedulable=True    openshift_node_group_name='node-config-master'
+################################################################################
+# A hosted registry, by default, will only be deployed on nodes labeled "node-role.kubernetes.io/infra=true".
+ip-10-0-10-21.eu-central-1.compute.internal         openshift_schedulable=True    openshift_node_group_name='node-config-compute'
+ip-10-0-10-22.eu-central-1.compute.internal         openshift_schedulable=True    openshift_node_group_name='node-config-compute'
+ip-10-0-10-23.eu-central-1.compute.internal         openshift_schedulable=True    openshift_node_group_name='node-config-infra'
+ip-10-0-10-24.eu-central-1.compute.internal         openshift_schedulable=True    openshift_node_group_name='node-config-infra'
+
+[etcd]
+ip-10-0-10-11.eu-central-1.compute.internal
+
+[glusterfs]
+ip-10-0-10-22.eu-central-1.compute.internal         glusterfs_devices='["/dev/xvdb"]'
+ip-10-0-10-23.eu-central-1.compute.internal         glusterfs_devices='["/dev/xvdb"]'
+ip-10-0-10-24.eu-central-1.compute.internal         glusterfs_devices='["/dev/xvdb"]'
